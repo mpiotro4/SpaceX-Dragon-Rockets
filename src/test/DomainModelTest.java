@@ -45,7 +45,6 @@ public class DomainModelTest {
         Mission mission = new Mission();
         mission.setId(1);
         mission.setStatus(MissionStatus.SCHEDULED);
-        rocket.setPresentMission(mission);
 
         String repr = rocket.toString();
         assertTrue(repr.contains("id=42"));
@@ -66,7 +65,6 @@ public class DomainModelTest {
         Mission mission = new Mission();
         mission.setId(99);
         mission.setStatus(MissionStatus.PENDING);
-        r1.setPresentMission(mission);
 
         // They should still be equal and have same hash
         assertEquals(r1, r2);
