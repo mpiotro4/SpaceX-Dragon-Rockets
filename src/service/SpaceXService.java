@@ -8,11 +8,11 @@ import model.Rocket;
 import model.RocketStatus;
 
 public interface SpaceXService {
-    void addRocket(Rocket rocket);
-    void assignRocketToMission(Rocket rocket, Mission mission);
-    void assignRocketsToMission(List<Rocket> rockets, Mission mission);
-    void changeRocketStatus(Rocket rocket, RocketStatus newStatus);
-    void changeMissionStatus(Mission mission, MissionStatus newStatus);
-    void addMission(Mission mission);
+    int addRocket();
+    void assignRocketToMission(int rocketId, int missionId);
+    void assignRocketsToMission(List<Integer> rocketsIds, int missionId);
+    void changeRocketStatus(int rocket, RocketStatus newStatus);
+    void changeMissionStatus(int missionId, MissionStatus newStatus);
+    int addMission(String missionName);
     List<MissionSummary> getSummary();
 }

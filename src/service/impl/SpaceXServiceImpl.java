@@ -18,45 +18,56 @@ public class SpaceXServiceImpl implements SpaceXService {
     private final Map<Integer, Rocket> rockets = new HashMap<>();
     private final Map<Integer, Mission> missions = new HashMap<>();
     private final Map<Integer, List<Integer>> missionAssignments = new HashMap<>();
+    private int nextRocketId = 1;
+    private int nextMissionId = 1;
 
     @Override
-    public void addRocket(Rocket rocket) {
-        rockets.put(rocket.getId(), rocket);
+    public int addRocket() {
+        int id = nextRocketId++;
+        Rocket rocket = new Rocket();
+        rocket.setId(id);
+        rocket.setStatus(RocketStatus.ON_GROUND);
+        rockets.put(id, rocket);
+        return id;
     }
 
     @Override
-    public void assignRocketToMission(Rocket rocket, Mission mission) {
-        missionAssignments.computeIfAbsent(mission.getId(), id -> new ArrayList<>());
-        missionAssignments.get(mission.getId()).add(rocket.getId());
+    public void assignRocketToMission(int rocketId, int missionId) {
+        missionAssignments.computeIfAbsent(missionId, mId -> new ArrayList<>());
+        missionAssignments.get(missionId).add(rocketId);
     }
 
     @Override
-    public void assignRocketsToMission(List<Rocket> rockets, Mission mission) {
-        for (Rocket r : rockets) {
-            assignRocketToMission(r, mission);
-        }
+    public void assignRocketsToMission(List<Integer> rocketIds, int missionId) {
+        rocketIds.forEach(rId -> assignRocketToMission(rId, missionId));
     }
 
     @Override
-    public void changeRocketStatus(Rocket rocket, RocketStatus newStatus) {
-        Rocket stored = rockets.get(rocket.getId());
+    public void changeRocketStatus(int rocketId, RocketStatus newStatus) {
+        Rocket stored = rockets.get(rocketId);
         if (stored != null) {
             stored.setStatus(newStatus);
         }
     }
 
     @Override
-    public void changeMissionStatus(Mission mission, MissionStatus newStatus) {
-        Mission stored = missions.get(mission.getId());
+    public void changeMissionStatus(int missionId, MissionStatus newStatus) {
+        Mission stored = missions.get(missionId);
         if (stored != null) {
             stored.setStatus(newStatus);
         }
     }
 
     @Override
-    public void addMission(Mission mission) {
-        missions.put(mission.getId(), mission);
-        missionAssignments.putIfAbsent(mission.getId(), new ArrayList<>());
+    public int addMission(String missionName) {
+        int id = nextMissionId++;
+        Mission mission = new Mission();
+        mission.setId(id);
+        mission.setStatus(MissionStatus.SCHEDULED);
+        mission.setName(missionName);
+        missions.put(id, mission);
+        missionAssignments.putIfAbsent(id, new ArrayList<>());
+        return id;
     }
 
     @Override
@@ -65,7 +76,7 @@ public class SpaceXServiceImpl implements SpaceXService {
         for (Mission mission : missions.values()) {
             int assigned = missionAssignments.getOrDefault(mission.getId(), Collections.emptyList()).size();
             MissionSummary summary = new MissionSummary();
-            summary.setMissionName(String.valueOf(mission.getId()));
+            summary.setMissionName(String.valueOf(mission.getName()));
             summary.setStatus(mission.getStatus());
             summary.setAssignedRockets(assigned);
             summaries.add(summary);
