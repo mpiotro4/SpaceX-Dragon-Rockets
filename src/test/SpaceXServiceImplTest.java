@@ -10,16 +10,17 @@ import model.Mission;
 import model.RocketStatus;
 import model.MissionStatus;
 import model.MissionSummary;
-import java.util.Collections;
 import java.util.List;
 
 public class SpaceXServiceImplTest {
 
     private final SpaceXService service = new SpaceXServiceImpl();
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetSummaryWhenEmpty() {
-        service.getSummary();
+        List<MissionSummary> summaries = service.getSummary();
+        assertNotNull(summaries);
+        assertTrue(summaries.isEmpty());
     }
 
     @Test
@@ -27,10 +28,8 @@ public class SpaceXServiceImplTest {
         Mission mission = new Mission();
         mission.setId(1);
         mission.setStatus(MissionStatus.SCHEDULED);
-        mission.setRockets(Collections.emptyList());
-        // should throw until implemented
+        service.addMission(mission);
         List<MissionSummary> summaries = service.getSummary();
-        // expected scenario: one summary with 0 rockets and SCHEDULED status
         assertEquals(1, summaries.size());
         MissionSummary summary = summaries.get(0);
         assertEquals(MissionStatus.SCHEDULED, summary.getStatus());
@@ -47,10 +46,8 @@ public class SpaceXServiceImplTest {
         rocket.setId(10);
         rocket.setStatus(RocketStatus.ON_GROUND);
         service.addRocket(rocket);
-        // scenario: assign a single rocket
         service.assignRocketToMission(rocket, mission);
 
-        // should reflect one rocket assigned
         List<MissionSummary> summaries = service.getSummary();
         assertEquals(1, summaries.get(0).getAssignedRockets());
     }
@@ -61,7 +58,6 @@ public class SpaceXServiceImplTest {
         mission.setId(2);
         mission.setStatus(MissionStatus.SCHEDULED);
         service.addMission(mission);
-        // scenario: change status to IN_PROGRESS
         service.changeMissionStatus(mission, MissionStatus.IN_PROGRESS);
 
         List<MissionSummary> summaries = service.getSummary();
