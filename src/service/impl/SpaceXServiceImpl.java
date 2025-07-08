@@ -12,6 +12,7 @@ import model.MissionStatus;
 import service.SpaceXService;
 
 import java.util.List;
+import service.SummaryService;
 
 public class SpaceXServiceImpl implements SpaceXService {
     private final Map<Integer, Rocket> rockets = new HashMap<>();
@@ -23,6 +24,16 @@ public class SpaceXServiceImpl implements SpaceXService {
     private int nextRocketId = 1;
 
     private int nextMissionId = 1;
+
+    private final SummaryService summaryService;
+
+    public SpaceXServiceImpl(SummaryService summaryService) {
+        this.summaryService = summaryService;
+    }
+
+    public SpaceXServiceImpl() {
+        this(new InMemorySummaryService());
+    }
 
     @Override
     public int addRocket() {
@@ -85,16 +96,7 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     @Override
     public List<MissionSummary> getSummary() {
-        List<MissionSummary> summaries = new ArrayList<>();
-        for (Mission mission : missions.values()) {
-            int assigned = missionAssignments.getOrDefault(mission.getId(), Collections.emptyList()).size();
-            MissionSummary summary = new MissionSummary();
-            summary.setMissionName(String.valueOf(mission.getName()));
-            summary.setStatus(mission.getStatus());
-            summary.setAssignedRockets(assigned);
-            summaries.add(summary);
-        }
-        return summaries;
+        return summaryService.generate(missions, missionAssignments);
     }
 
     private void deriveAndSetMission(int missionId) {
