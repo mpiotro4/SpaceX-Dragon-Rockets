@@ -10,14 +10,16 @@ import model.RocketStatus;
  */
 public interface SpaceXService {
     /**
-     * Creates a new Rocket and returns its ID.
+     * Creates a new Rocket using the factory associated with the given type
+     * and returns its ID.
      */
-    int addRocket();
+    int addRocket(Class<? extends model.Rocket> rocketType);
 
     /**
-     * Creates a new Mission with the given name and returns its ID.
+     * Creates a new Mission using the factory associated with the given type
+     * and returns its ID.
      */
-    int addMission(String missionName);
+    int addMission(String missionName, Class<? extends model.Mission> missionType);
 
     /**
      * Assigns a rocket to a mission by their IDs.

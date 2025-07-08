@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import model.RocketStatus;
+import model.impl.DragonMission;
+import model.impl.DragonRocket;
 import org.junit.Test;
 import service.SpaceXService;
 import model.MissionStatus;
@@ -25,7 +27,7 @@ public class SpaceXServiceImplTest {
     @Test
     public void testAddMissionThenGetSummary() {
         String name = "Mars";
-        int missionId = service.addMission(name);
+        int missionId = service.addMission(name, DragonMission.class);
         List<MissionSummary> summaries = service.getSummary();
         assertEquals(1, summaries.size());
         MissionSummary summary = summaries.get(0);
@@ -37,9 +39,9 @@ public class SpaceXServiceImplTest {
     @Test
     public void testAssignMultipleRocketsToMissionUpdatesSummary() {
         String name = "Moon";
-        int missionId = service.addMission(name);
-        int r1 = service.addRocket();
-        int r2 = service.addRocket();
+        int missionId = service.addMission(name, DragonMission.class);
+        int r1 = service.addRocket(DragonRocket.class);
+        int r2 = service.addRocket(DragonRocket.class);
         service.assignRocketsToMission(Arrays.asList(r1, r2), missionId);
 
         List<MissionSummary> summaries = service.getSummary();
@@ -49,8 +51,8 @@ public class SpaceXServiceImplTest {
     @Test
     public void testChangeRocketStatusToInRepairSetsMissionPending() {
         String name = "Mars";
-        int missionId = service.addMission(name);
-        int rocketId = service.addRocket();
+        int missionId = service.addMission(name, DragonMission.class);
+        int rocketId = service.addRocket(DragonRocket.class);
         service.assignRocketToMission(rocketId, missionId);
         service.changeRocketStatus(rocketId, RocketStatus.IN_REPAIR);
 
@@ -61,8 +63,8 @@ public class SpaceXServiceImplTest {
     @Test
     public void testMissionEndsWhenAllRocketsReturnOnGround() {
         String name = "ISS";
-        int missionId = service.addMission(name);
-        int rocketId = service.addRocket();
+        int missionId = service.addMission(name, DragonMission.class);
+        int rocketId = service.addRocket(DragonRocket.class);
         service.assignRocketToMission(rocketId, missionId);
         service.changeRocketStatus(rocketId, RocketStatus.IN_SPACE);
         service.changeRocketStatus(rocketId, RocketStatus.ON_GROUND);
@@ -74,7 +76,7 @@ public class SpaceXServiceImplTest {
     @Test
     public void testChangeMissionStatusReflectsInSummary() {
         String name = "ISS";
-        int missionId = service.addMission(name);
+        int missionId = service.addMission(name, DragonMission.class);
         service.changeMissionStatus(missionId, MissionStatus.IN_PROGRESS);
 
         List<MissionSummary> summaries = service.getSummary();

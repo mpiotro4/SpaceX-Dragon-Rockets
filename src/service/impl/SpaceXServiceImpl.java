@@ -27,9 +27,9 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     private final SummaryService summaryService;
 
-    private final RocketFactory rocketFactory;
+    private final Map<Class<? extends Rocket>, RocketFactory> rocketFactories;
 
-    private final MissionFactory missionFactory;
+    private final Map<Class<? extends Mission>, MissionFactory> missionFactories;
 
     private final CrudRepository<Rocket, Integer> rocketRepo;
 
@@ -39,15 +39,15 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     public SpaceXServiceImpl(
             SummaryService summaryService,
-            RocketFactory rocketFactory,
-            MissionFactory missionFactory,
+            Map<Class<? extends Rocket>, RocketFactory> rocketFactories,
+            Map<Class<? extends Mission>, MissionFactory> missionFactories,
             CrudRepository<Rocket, Integer> rocketRepo,
             CrudRepository<Mission, Integer> missionRepo,
             StatusService statusService
     ) {
         this.summaryService = summaryService;
-        this.rocketFactory = rocketFactory;
-        this.missionFactory = missionFactory;
+        this.rocketFactories = rocketFactories;
+        this.missionFactories = missionFactories;
         this.rocketRepo = rocketRepo;
         this.missionRepo = missionRepo;
         this.statusService = statusService;
@@ -57,23 +57,33 @@ public class SpaceXServiceImpl implements SpaceXService {
         CrudRepository<Rocket, Integer> rRepo = new InMemoryRocketRepository();
         CrudRepository<Mission, Integer> mRepo = new InMemoryMissionRepository();
         this.summaryService = new service.impl.InMemorySummaryService();
-        this.rocketFactory = new DragonRocketFactory();
-        this.missionFactory = new DragonMissionFactory();
+        this.rocketFactories = new HashMap<>();
+        this.rocketFactories.put(model.impl.DragonRocket.class, new DragonRocketFactory());
+        this.missionFactories = new HashMap<>();
+        this.missionFactories.put(model.impl.DragonMission.class, new DragonMissionFactory());
         this.rocketRepo = rRepo;
         this.missionRepo = mRepo;
         this.statusService = new StatusServiceImpl(rRepo, mRepo);
     }
 
     @Override
-    public int addRocket() {
-        Rocket rocket = rocketFactory.createRocket();
+    public int addRocket(Class<? extends Rocket> rocketType) {
+        RocketFactory factory = rocketFactories.get(rocketType);
+        if (factory == null) {
+            throw new IllegalArgumentException("No factory registered for " + rocketType);
+        }
+        Rocket rocket = factory.createRocket();
         rocket.setStatus(RocketStatus.ON_GROUND);
         return rocketRepo.save(rocket).getId();
     }
 
     @Override
-    public int addMission(String missionName) {
-        Mission mission = missionFactory.createMission(missionName);
+    public int addMission(String missionName, Class<? extends Mission> missionType) {
+        MissionFactory factory = missionFactories.get(missionType);
+        if (factory == null) {
+            throw new IllegalArgumentException("No factory registered for " + missionType);
+        }
+        Mission mission = factory.createMission(missionName);
         Mission saved = missionRepo.save(mission);
         missionAssignments.putIfAbsent(saved.getId(), new ArrayList<>());
         return saved.getId();
