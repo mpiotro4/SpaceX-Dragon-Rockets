@@ -1,11 +1,11 @@
 package repository.impl;
 
-import repository.RocketRepository;
+import repository.CrudRepository;
 import model.Rocket;
 
 import java.util.*;
 
-public class InMemoryRocketRepository implements RocketRepository {
+public class InMemoryRocketRepository implements CrudRepository<Rocket, Integer> {
     private final Map<Integer, Rocket> store = new HashMap<>();
     private int nextId = 1;
 
@@ -19,7 +19,7 @@ public class InMemoryRocketRepository implements RocketRepository {
     }
 
     @Override
-    public Optional<Rocket> findById(int id) {
+    public Optional<Rocket> findById(Integer id) {
         return Optional.ofNullable(store.get(id));
     }
 

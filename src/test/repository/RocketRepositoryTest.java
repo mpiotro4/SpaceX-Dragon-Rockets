@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import repository.RocketRepository;
+import repository.CrudRepository;
 import repository.impl.InMemoryRocketRepository;
 import model.DragonRocket;
 import model.Rocket;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class RocketRepositoryTest {
-    private RocketRepository repo;
+    private CrudRepository<Rocket, Integer> repo;
 
     @Before
     public void setUp() {

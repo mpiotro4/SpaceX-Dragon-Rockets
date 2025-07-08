@@ -11,8 +11,7 @@ import model.Mission;
 import model.MissionSummary;
 import model.RocketStatus;
 import model.MissionStatus;
-import repository.MissionRepository;
-import repository.RocketRepository;
+import repository.CrudRepository;
 import repository.impl.InMemoryMissionRepository;
 import repository.impl.InMemoryRocketRepository;
 import factory.RocketFactory;
@@ -29,11 +28,10 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     private final RocketFactory rocketFactory;
 
-    private final RocketRepository rocketRepo;
+    private final CrudRepository<Rocket, Integer> rocketRepo;
+    private final CrudRepository<Mission, Integer> missionRepo;
 
-    private final MissionRepository missionRepo;
-
-    public SpaceXServiceImpl(SummaryService summaryService, RocketFactory rocketFactory, RocketRepository rocketRepo, MissionRepository missionRepo) {
+    public SpaceXServiceImpl(SummaryService summaryService, RocketFactory rocketFactory, CrudRepository<Rocket, Integer> rocketRepo, CrudRepository<Mission, Integer> missionRepo) {
         this.summaryService = summaryService;
         this.rocketFactory = rocketFactory;
         this.rocketRepo = rocketRepo;

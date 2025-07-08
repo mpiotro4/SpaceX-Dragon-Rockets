@@ -1,11 +1,11 @@
 package repository.impl;
 
-import repository.MissionRepository;
+import repository.CrudRepository;
 import model.Mission;
 
 import java.util.*;
 
-public class InMemoryMissionRepository implements MissionRepository {
+public class InMemoryMissionRepository implements CrudRepository<Mission, Integer> {
     private final Map<Integer, Mission> store = new HashMap<>();
     private int nextId = 1;
 
@@ -19,7 +19,7 @@ public class InMemoryMissionRepository implements MissionRepository {
     }
 
     @Override
-    public Optional<Mission> findById(int id) {
+    public Optional<Mission> findById(Integer id) {
         return Optional.ofNullable(store.get(id));
     }
 

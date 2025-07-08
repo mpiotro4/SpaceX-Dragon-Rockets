@@ -2,9 +2,10 @@ package test.repository;
 
 import static org.junit.Assert.*;
 
+import model.Rocket;
 import org.junit.Before;
 import org.junit.Test;
-import repository.MissionRepository;
+import repository.CrudRepository;
 import repository.impl.InMemoryMissionRepository;
 import model.Mission;
 import model.MissionStatus;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MissionRepositoryTest {
-    private MissionRepository repo;
+    private CrudRepository<Mission, Integer> repo;
 
     @Before
     public void setUp() {
