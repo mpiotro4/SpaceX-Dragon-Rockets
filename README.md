@@ -1,4 +1,4 @@
-# SpaceX In-Memory Service
+# SIX Coding Exercise - SpaceX Dragon Rockets Repository
 
 This project simulates core SpaceX operations (rockets and missions) entirely in memory. It demonstrates a clean, SOLID-aligned architecture with:
 
