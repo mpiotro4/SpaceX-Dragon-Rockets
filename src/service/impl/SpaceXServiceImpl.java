@@ -33,10 +33,6 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     private final MissionRepository missionRepo;
 
-    private int nextRocketId = 1;
-
-    private int nextMissionId = 1;
-
     public SpaceXServiceImpl(SummaryService summaryService, RocketFactory rocketFactory, RocketRepository rocketRepo, MissionRepository missionRepo) {
         this.summaryService = summaryService;
         this.rocketFactory = rocketFactory;
@@ -50,23 +46,20 @@ public class SpaceXServiceImpl implements SpaceXService {
 
    @Override
     public int addRocket() {
-        int id = nextRocketId++;
-        Rocket rocket = rocketFactory.createRocket(id);
+        Rocket rocket = rocketFactory.createRocket();
         rocket.setStatus(RocketStatus.ON_GROUND);
-        rocketRepo.save(rocket);
-        return id;
+        Rocket saved = rocketRepo.save(rocket);
+        return saved.getId();
     }
 
     @Override
     public int addMission(String missionName) {
-        int id = nextMissionId++;
         Mission mission = new Mission();
-        mission.setId(id);
         mission.setName(missionName);
         mission.setStatus(MissionStatus.SCHEDULED);
-        missionRepo.save(mission);
-        missionAssignments.putIfAbsent(id, new ArrayList<>());
-        return id;
+        Mission saved = missionRepo.save(mission);
+        missionAssignments.putIfAbsent(saved.getId(), new ArrayList<>());
+        return saved.getId();
     }
 
     @Override

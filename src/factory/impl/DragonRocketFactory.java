@@ -9,9 +9,9 @@ import factory.RocketFactory;
  */
 public class DragonRocketFactory implements RocketFactory {
     @Override
-    public Rocket createRocket(int id) {
+    public Rocket createRocket() {
         DragonRocket rocket = new DragonRocket();
-        rocket.setId(id);
+        rocket.setId(0);
         return rocket;
     }
 }

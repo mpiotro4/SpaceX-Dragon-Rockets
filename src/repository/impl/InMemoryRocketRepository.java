@@ -7,9 +7,13 @@ import java.util.*;
 
 public class InMemoryRocketRepository implements RocketRepository {
     private final Map<Integer, Rocket> store = new HashMap<>();
+    private int nextId = 1;
 
     @Override
     public Rocket save(Rocket rocket) {
+        if (rocket.getId() <= 0) {
+            rocket.setId(nextId++);
+        }
         store.put(rocket.getId(), rocket);
         return rocket;
     }
