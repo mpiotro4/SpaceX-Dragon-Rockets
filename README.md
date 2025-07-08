@@ -54,17 +54,11 @@ src/
      └─ service/impl/      # StatusService & SpaceXService tests
 ```
 
-## Extensibility
+## Assumptions & Extensibility
 
-* Swap `InMemoryRocketRepository` with a JPA- or DB-backed implementation
-* Add new rocket or mission types by providing custom `RocketFactory`/`MissionFactory`
-* Extend status derivation logic in enums without modifying service code
-* Introduce custom exceptions (e.g. `RocketNotFoundException`, `InvalidStatusTransitionException`) and validation at service boundaries
-* Integrate a DI framework (e.g. Spring, Guice) for streamlined configuration
-* Add logging and metrics (e.g. SLF4J, Micrometer) for observability
-* Expose a RESTful API layer with DTOs and mappers
-* Centralize validation rules using Bean Validation (JSR 380)
-* Emit domain events for mission lifecycle changes to decouple side-effects
+* Add remove of missions and rockets - it wasn't specified as requirement, so I assumed it was out of scope.
+* Introduce validation and custom exceptions - library can be easily broken by providing invalid data and doesn't give any meaningful feedback    
+* Add logging 
 
 ## Use of AI
 
