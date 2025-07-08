@@ -1,9 +1,8 @@
 package model;
 
-import lombok.Data;
-
-@Data
-public class Rocket {
-    private int id;
-    private RocketStatus status;
+public interface Rocket {
+    int getId();
+    void setId(int id);
+    RocketStatus getStatus();
+    void setStatus(RocketStatus status);
 }

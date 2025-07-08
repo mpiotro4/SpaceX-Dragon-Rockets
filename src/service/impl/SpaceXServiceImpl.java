@@ -9,6 +9,7 @@ import model.Mission;
 import model.MissionSummary;
 import model.RocketStatus;
 import model.MissionStatus;
+import service.RocketFactory;
 import service.SpaceXService;
 
 import java.util.List;
@@ -21,24 +22,27 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     private final Map<Integer, List<Integer>> missionAssignments = new HashMap<>();
 
+    private final SummaryService summaryService;
+
+    private final RocketFactory rocketFactory;
+
     private int nextRocketId = 1;
 
     private int nextMissionId = 1;
 
-    private final SummaryService summaryService;
-
-    public SpaceXServiceImpl(SummaryService summaryService) {
+    public SpaceXServiceImpl(SummaryService summaryService, RocketFactory rocketFactory) {
         this.summaryService = summaryService;
+        this.rocketFactory = rocketFactory;
     }
 
     public SpaceXServiceImpl() {
-        this(new InMemorySummaryService());
+        this(new InMemorySummaryService(), new DragonRocketFactory());
     }
 
     @Override
     public int addRocket() {
         int id = nextRocketId++;
-        Rocket rocket = new Rocket();
+        Rocket rocket = rocketFactory.createRocket(id);
         rocket.setId(id);
         rocket.setStatus(RocketStatus.ON_GROUND);
         rockets.put(id, rocket);
