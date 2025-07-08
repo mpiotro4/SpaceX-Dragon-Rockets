@@ -1,10 +1,10 @@
 package model;
 
-import lombok.Data;
-
-@Data
-public class Mission {
-    private int id;
-    private String name;
-    private MissionStatus status;
+public interface Mission {
+    int getId();
+    void setId(int id);
+    String getName();
+    void setName(String name);
+    MissionStatus getStatus();
+    void setStatus(MissionStatus status);
 }

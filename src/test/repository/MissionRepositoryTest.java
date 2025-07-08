@@ -2,7 +2,7 @@ package test.repository;
 
 import static org.junit.Assert.*;
 
-import model.Rocket;
+import model.DragonMission;
 import org.junit.Before;
 import org.junit.Test;
 import repository.CrudRepository;
@@ -23,7 +23,7 @@ public class MissionRepositoryTest {
 
     @Test
     public void testSaveAndFindById() {
-        Mission mission = new Mission();
+        Mission mission = new DragonMission();
         mission.setId(1);
         mission.setName("Mars");
         mission.setStatus(MissionStatus.SCHEDULED);
@@ -36,8 +36,8 @@ public class MissionRepositoryTest {
 
     @Test
     public void testFindAll() {
-        Mission m1 = new Mission(); m1.setId(1); m1.setName("A"); m1.setStatus(MissionStatus.SCHEDULED);
-        Mission m2 = new Mission(); m2.setId(2); m2.setName("B"); m2.setStatus(MissionStatus.IN_PROGRESS);
+        Mission m1 = new DragonMission(); m1.setId(1); m1.setName("A"); m1.setStatus(MissionStatus.SCHEDULED);
+        Mission m2 = new DragonMission(); m2.setId(2); m2.setName("B"); m2.setStatus(MissionStatus.IN_PROGRESS);
         repo.save(m1);
         repo.save(m2);
 
