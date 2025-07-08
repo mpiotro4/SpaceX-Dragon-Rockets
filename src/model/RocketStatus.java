@@ -1,22 +1,38 @@
 package model;
 
+import java.util.List;
+import java.util.Objects;
+
 public enum RocketStatus {
-    ON_GROUND("On ground"),
-    IN_SPACE("In space"),
-    IN_REPAIR("In repair");
+    IN_REPAIR {
+        @Override
+        boolean matches(List<MissionStatus> missionStatuses, RocketStatus prev) {
+            return missionStatuses.contains(MissionStatus.PENDING);
+        }
+    },
+    IN_SPACE {
+        @Override
+        boolean matches(List<MissionStatus> missionStatuses, RocketStatus prev) {
+            return missionStatuses.contains(MissionStatus.IN_PROGRESS)
+                   && !missionStatuses.contains(MissionStatus.PENDING);
+        }
+    },
+    ON_GROUND {
+        @Override
+        boolean matches(List<MissionStatus> missionStatuses, RocketStatus prev) {
+            return missionStatuses.stream()
+                    .allMatch(ms -> ms == MissionStatus.SCHEDULED || ms == MissionStatus.ENDED);
+        }
+    };
 
-    private final String description;
+    abstract boolean matches(List<MissionStatus> missionStatuses, RocketStatus prev);
 
-    RocketStatus(String description) {
-        this.description = description;
-    }
-
-    public String getStatusDescription() {
-        return description;
-    }
-
-    @Override
-    public String toString() {
-        return description;
+    public static RocketStatus derive(List<MissionStatus> missionStatuses, RocketStatus prev) {
+        for (RocketStatus st : values()) {
+            if (st.matches(Objects.requireNonNull(missionStatuses), prev)) {
+                return st;
+            }
+        }
+        return prev;
     }
 }

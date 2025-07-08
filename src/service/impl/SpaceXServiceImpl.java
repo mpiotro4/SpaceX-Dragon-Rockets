@@ -14,11 +14,14 @@ import service.SpaceXService;
 import java.util.List;
 
 public class SpaceXServiceImpl implements SpaceXService {
-
     private final Map<Integer, Rocket> rockets = new HashMap<>();
+
     private final Map<Integer, Mission> missions = new HashMap<>();
+
     private final Map<Integer, List<Integer>> missionAssignments = new HashMap<>();
+
     private int nextRocketId = 1;
+
     private int nextMissionId = 1;
 
     @Override
@@ -29,33 +32,6 @@ public class SpaceXServiceImpl implements SpaceXService {
         rocket.setStatus(RocketStatus.ON_GROUND);
         rockets.put(id, rocket);
         return id;
-    }
-
-    @Override
-    public void assignRocketToMission(int rocketId, int missionId) {
-        missionAssignments.computeIfAbsent(missionId, mId -> new ArrayList<>());
-        missionAssignments.get(missionId).add(rocketId);
-    }
-
-    @Override
-    public void assignRocketsToMission(List<Integer> rocketIds, int missionId) {
-        rocketIds.forEach(rId -> assignRocketToMission(rId, missionId));
-    }
-
-    @Override
-    public void changeRocketStatus(int rocketId, RocketStatus newStatus) {
-        Rocket stored = rockets.get(rocketId);
-        if (stored != null) {
-            stored.setStatus(newStatus);
-        }
-    }
-
-    @Override
-    public void changeMissionStatus(int missionId, MissionStatus newStatus) {
-        Mission stored = missions.get(missionId);
-        if (stored != null) {
-            stored.setStatus(newStatus);
-        }
     }
 
     @Override
@@ -71,6 +47,43 @@ public class SpaceXServiceImpl implements SpaceXService {
     }
 
     @Override
+    public void assignRocketToMission(int rocketId, int missionId) {
+        missionAssignments.computeIfAbsent(missionId, mId -> new ArrayList<>()).add(rocketId);
+        deriveAndSetMission(missionId);
+        deriveAndSetRocket(rocketId);
+    }
+
+    @Override
+    public void assignRocketsToMission(List<Integer> rocketIds, int missionId) {
+        for (int rId : rocketIds) {
+            assignRocketToMission(rId, missionId);
+        }
+    }
+
+    @Override
+    public void changeRocketStatus(int rocketId, RocketStatus newStatus) {
+        Rocket r = rockets.get(rocketId);
+        if (r != null) {
+            r.setStatus(newStatus);
+            missionAssignments.forEach((mid, list) -> {
+                if (list.contains(rocketId)) {
+                    deriveAndSetMission(mid);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void changeMissionStatus(int missionId, MissionStatus newStatus) {
+        Mission m = missions.get(missionId);
+        if (m != null) {
+            m.setStatus(newStatus);
+            missionAssignments.getOrDefault(missionId, Collections.emptyList())
+                              .forEach(this::deriveAndSetRocket);
+        }
+    }
+
+    @Override
     public List<MissionSummary> getSummary() {
         List<MissionSummary> summaries = new ArrayList<>();
         for (Mission mission : missions.values()) {
@@ -82,5 +95,29 @@ public class SpaceXServiceImpl implements SpaceXService {
             summaries.add(summary);
         }
         return summaries;
+    }
+
+    private void deriveAndSetMission(int missionId) {
+        Mission m = missions.get(missionId);
+        if (m != null) {
+            List<RocketStatus> statuses = missionAssignments.getOrDefault(missionId, Collections.emptyList()).stream()
+                                                            .map(rockets::get)
+                                                            .map(Rocket::getStatus)
+                                                            .toList();
+            MissionStatus newSt = MissionStatus.derive(statuses, m.getStatus());
+            m.setStatus(newSt);
+        }
+    }
+
+    private void deriveAndSetRocket(int rocketId) {
+        Rocket r = rockets.get(rocketId);
+        if (r != null) {
+            List<MissionStatus> missionsStatuses = missionAssignments.entrySet().stream()
+                                                                     .filter(e -> e.getValue().contains(rocketId))
+                                                                     .map(e -> missions.get(e.getKey()).getStatus())
+                                                                     .toList();
+            RocketStatus newSt = RocketStatus.derive(missionsStatuses, r.getStatus());
+            r.setStatus(newSt);
+        }
     }
 }
