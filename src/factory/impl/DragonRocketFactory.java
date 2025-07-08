@@ -1,8 +1,8 @@
-package service.impl;
+package factory.impl;
 
 import model.DragonRocket;
 import model.Rocket;
-import service.RocketFactory;
+import factory.RocketFactory;
 
 /**
  * Default RocketFactory producing DragonRocket instances.
