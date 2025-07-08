@@ -4,10 +4,8 @@ import factory.MissionFactory;
 import factory.impl.DragonMissionFactory;
 import factory.impl.DragonRocketFactory;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import model.Rocket;
 import model.Mission;
 import model.MissionSummary;
@@ -20,6 +18,7 @@ import factory.RocketFactory;
 import service.SpaceXService;
 
 import java.util.List;
+import service.StatusService;
 import service.SummaryService;
 
 public class SpaceXServiceImpl implements SpaceXService {
@@ -36,25 +35,40 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     private final CrudRepository<Mission, Integer> missionRepo;
 
-    public SpaceXServiceImpl(SummaryService summaryService, RocketFactory rocketFactory, MissionFactory missionFactory, CrudRepository<Rocket, Integer> rocketRepo,
-            CrudRepository<Mission, Integer> missionRepo) {
+    private final StatusService statusService;
+
+    public SpaceXServiceImpl(
+            SummaryService summaryService,
+            RocketFactory rocketFactory,
+            MissionFactory missionFactory,
+            CrudRepository<Rocket, Integer> rocketRepo,
+            CrudRepository<Mission, Integer> missionRepo,
+            StatusService statusService
+    ) {
         this.summaryService = summaryService;
         this.rocketFactory = rocketFactory;
         this.missionFactory = missionFactory;
         this.rocketRepo = rocketRepo;
         this.missionRepo = missionRepo;
+        this.statusService = statusService;
     }
 
     public SpaceXServiceImpl() {
-        this(new InMemorySummaryService(), new DragonRocketFactory(), new DragonMissionFactory(), new InMemoryRocketRepository(), new InMemoryMissionRepository());
+        CrudRepository<Rocket, Integer> rRepo = new InMemoryRocketRepository();
+        CrudRepository<Mission, Integer> mRepo = new InMemoryMissionRepository();
+        this.summaryService = new service.impl.InMemorySummaryService();
+        this.rocketFactory = new DragonRocketFactory();
+        this.missionFactory = new DragonMissionFactory();
+        this.rocketRepo = rRepo;
+        this.missionRepo = mRepo;
+        this.statusService = new StatusServiceImpl(rRepo, mRepo);
     }
 
     @Override
     public int addRocket() {
         Rocket rocket = rocketFactory.createRocket();
         rocket.setStatus(RocketStatus.ON_GROUND);
-        Rocket saved = rocketRepo.save(rocket);
-        return saved.getId();
+        return rocketRepo.save(rocket).getId();
     }
 
     @Override
@@ -67,14 +81,16 @@ public class SpaceXServiceImpl implements SpaceXService {
 
     @Override
     public void assignRocketToMission(int rocketId, int missionId) {
-        missionAssignments.computeIfAbsent(missionId, mId -> new ArrayList<>()).add(rocketId);
-        deriveAndSetMission(missionId);
-        deriveAndSetRocket(rocketId);
+        missionAssignments.computeIfAbsent(missionId, id -> new ArrayList<>()).add(rocketId);
+        statusService.updateMissionStatus(missionId, missionAssignments);
+        statusService.updateRocketStatus(rocketId, missionAssignments);
     }
 
     @Override
     public void assignRocketsToMission(List<Integer> rocketIds, int missionId) {
-        rocketIds.forEach(rId -> assignRocketToMission(rId, missionId));
+        for (int rId : rocketIds) {
+            assignRocketToMission(rId, missionId);
+        }
     }
 
     @Override
@@ -82,11 +98,7 @@ public class SpaceXServiceImpl implements SpaceXService {
         rocketRepo.findById(rocketId).ifPresent(r -> {
             r.setStatus(newStatus);
             rocketRepo.save(r);
-            missionAssignments.forEach((mid, list) -> {
-                if (list.contains(rocketId)) {
-                    deriveAndSetMission(mid);
-                }
-            });
+            statusService.updateMissionStatusForRocket(rocketId, missionAssignments);
         });
     }
 
@@ -95,44 +107,14 @@ public class SpaceXServiceImpl implements SpaceXService {
         missionRepo.findById(missionId).ifPresent(m -> {
             m.setStatus(newStatus);
             missionRepo.save(m);
-            missionAssignments.getOrDefault(missionId, Collections.emptyList())
-                              .forEach(this::deriveAndSetRocket);
+            statusService.updateRocketsStatusForMission(missionId, missionAssignments);
         });
     }
 
     @Override
     public List<MissionSummary> getSummary() {
-        Map<Integer, Mission> missions = new HashMap<>();
-        missionRepo.findAll().forEach(m -> missions.put(m.getId(), m));
-        return summaryService.generate(missions, missionAssignments);
-    }
-
-    private void deriveAndSetMission(int missionId) {
-        missionRepo.findById(missionId).ifPresent(m -> {
-            List<RocketStatus> statuses = missionAssignments.getOrDefault(missionId, Collections.emptyList()).stream()
-                                                            .map(rocketRepo::findById)
-                                                            .filter(Optional::isPresent)
-                                                            .map(Optional::get)
-                                                            .map(Rocket::getStatus)
-                                                            .toList();
-            MissionStatus newSt = MissionStatus.derive(statuses, m.getStatus());
-            m.setStatus(newSt);
-            missionRepo.save(m);
-        });
-    }
-
-    private void deriveAndSetRocket(int rocketId) {
-        rocketRepo.findById(rocketId).ifPresent(r -> {
-            List<MissionStatus> missionStatuses = missionAssignments.entrySet().stream()
-                                                                    .filter(e -> e.getValue().contains(rocketId))
-                                                                    .map(e -> missionRepo.findById(e.getKey()))
-                                                                    .filter(Optional::isPresent)
-                                                                    .map(Optional::get)
-                                                                    .map(Mission::getStatus)
-                                                                    .toList();
-            RocketStatus newSt = RocketStatus.derive(missionStatuses, r.getStatus());
-            r.setStatus(newSt);
-            rocketRepo.save(r);
-        });
+        Map<Integer, Mission> all = new HashMap<>();
+        missionRepo.findAll().forEach(m -> all.put(m.getId(), m));
+        return summaryService.generate(all, missionAssignments);
     }
 }
