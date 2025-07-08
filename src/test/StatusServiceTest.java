@@ -1,4 +1,4 @@
-package test.service.impl.status;
+package test;
 
 import static org.junit.Assert.*;
 
