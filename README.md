@@ -56,6 +56,7 @@ src/
 
 ## Assumptions & Extensibility
 
+* Manual constructor-based dependency injection works for quick prototypes but can become unwieldy. I would recommend using a DI framework (e.g. Spring) for more efficient, scalable configuration, although constructor injection was chosen here for simplicity
 * Add remove of missions and rockets - it wasn't specified as requirement, so I assumed it was out of scope.
 * Introduce validation and custom exceptions - library can be easily broken by providing invalid data and doesn't give any meaningful feedback    
 * Add logging 
