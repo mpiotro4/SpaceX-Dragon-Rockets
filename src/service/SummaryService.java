@@ -1,7 +1,7 @@
 package service;
 
 import model.Mission;
-import model.MissionSummary;
+import model.impl.MissionSummary;
 
 import java.util.List;
 import java.util.Map;

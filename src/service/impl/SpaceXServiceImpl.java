@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import model.Rocket;
 import model.Mission;
-import model.MissionSummary;
+import model.impl.MissionSummary;
 import model.RocketStatus;
 import model.MissionStatus;
 import repository.CrudRepository;

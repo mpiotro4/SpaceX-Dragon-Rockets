@@ -2,7 +2,7 @@ package service;
 
 import java.util.List;
 import model.MissionStatus;
-import model.MissionSummary;
+import model.impl.MissionSummary;
 import model.RocketStatus;
 
 /**

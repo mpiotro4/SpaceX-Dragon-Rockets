@@ -7,7 +7,7 @@ import model.RocketStatus;
 import org.junit.Test;
 import service.SpaceXService;
 import model.MissionStatus;
-import model.MissionSummary;
+import model.impl.MissionSummary;
 import java.util.List;
 import service.impl.SpaceXServiceImpl;
 

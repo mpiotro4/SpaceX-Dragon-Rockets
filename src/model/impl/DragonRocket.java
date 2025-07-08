@@ -1,6 +1,8 @@
-package model;
+package model.impl;
 
 import lombok.Data;
+import model.Rocket;
+import model.RocketStatus;
 
 @Data
 public class DragonRocket implements Rocket {

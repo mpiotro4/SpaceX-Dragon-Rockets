@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import repository.CrudRepository;
 import repository.impl.InMemoryRocketRepository;
-import model.DragonRocket;
+import model.impl.DragonRocket;
 import model.Rocket;
 import model.RocketStatus;
 

@@ -2,10 +2,10 @@ package test.repository.impl;
 
 import static org.junit.Assert.*;
 
-import model.DragonMission;
+import model.impl.DragonMission;
 import org.junit.Before;
 import org.junit.Test;
-import model.DragonRocket;
+import model.impl.DragonRocket;
 import model.Rocket;
 import model.Mission;
 import model.RocketStatus;

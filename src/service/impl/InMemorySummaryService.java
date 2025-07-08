@@ -1,7 +1,7 @@
 package service.impl;
 
 import model.Mission;
-import model.MissionSummary;
+import model.impl.MissionSummary;
 import service.SummaryService;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package factory.impl;
 
-import model.DragonRocket;
+import model.impl.DragonRocket;
 import model.Rocket;
 import factory.RocketFactory;
 

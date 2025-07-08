@@ -1,7 +1,7 @@
 package factory.impl;
 
 import factory.MissionFactory;
-import model.DragonMission;
+import model.impl.DragonMission;
 import model.MissionStatus;
 
 public class DragonMissionFactory implements MissionFactory {

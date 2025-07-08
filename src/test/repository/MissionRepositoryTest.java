@@ -2,7 +2,7 @@ package test.repository;
 
 import static org.junit.Assert.*;
 
-import model.DragonMission;
+import model.impl.DragonMission;
 import org.junit.Before;
 import org.junit.Test;
 import repository.CrudRepository;

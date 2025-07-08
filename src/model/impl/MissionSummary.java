@@ -1,7 +1,8 @@
-package model;
+package model.impl;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import model.MissionStatus;
 
 @Data
 @NoArgsConstructor
