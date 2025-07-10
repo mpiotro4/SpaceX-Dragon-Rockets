@@ -32,28 +32,29 @@ This project simulates core SpaceX operations (rockets and missions) entirely in
 
 ### Prerequisites
 * Java 11+
-* IntelliJ IDEA (built-in build and test runner)
+* Maven 3.8+
 
 ### Build & Test
-Open the project in IntelliJ and use **Build → Build Project**. Run all tests via **Run → Run 'All Tests'** or using the IDE's test icons in the editor gutter.
+Run `mvn clean test` to compile the project and execute the unit tests.
 
 ## Project Structure
 
 ```
 src/
  ├─ main/
- │   ├─ java/
- │   │   ├─ model/          # Domain interfaces & enums
- │   │   ├─ repository/     # Generic and in-memory repos
- │   │   ├─ repository/impl # Implementations of repos  
- │   │   ├─ service/        # Core interfaces
- │   │   └─ service/impl/   # Implementations (including StatusUpdater)
+ │   └─ java/
+ │       ├─ model/          # Domain interfaces & enums
+ │       ├─ repository/     # Generic and in-memory repos
+ │       ├─ repository/impl # Implementations of repos
+ │       ├─ service/        # Core interfaces
+ │       └─ service/impl/   # Implementations (including StatusUpdater)
  └─ test/
-     ├─ domain/            # Domain-model unit tests
-     ├─ repository/        # Repository contract tests
-     └─ service/impl/      # StatusService & SpaceXService tests
-```
+     └─ java/
+         ├─ domain/            # Domain-model unit tests
+         ├─ repository/        # Repository contract tests
+         └─ service/impl/      # StatusService & SpaceXService tests
 
+```
 ## Assumptions & Extensibility
 
 * Manual constructor-based dependency injection works for quick prototypes but can become unwieldy. I would recommend using a DI framework (e.g. Spring) for more efficient, scalable configuration, although constructor injection was chosen here for simplicity
